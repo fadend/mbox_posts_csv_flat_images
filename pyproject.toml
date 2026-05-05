@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mbox_posts_csv_flat_images"
+description = "Extract photos and text from posts in mbox format."
+authors = [
+  {name = "David Faden", email = "dfaden@gmail.com"},
+]
+version = "0.1.0"
+license = {text = "MIT License"}
+dependencies = []
