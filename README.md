@@ -6,6 +6,8 @@ This is part of a project to preserve posts from a photo mailing list.
 
 ## Usage
 
+Since this has no external dependencies, we can run it directly like so:
+
 ```
 python mbox_posts_csv_flat_images/extract.py \
   --input_mbox "/Volumes/ThumbDrive/Test.mbox/mbox" \
