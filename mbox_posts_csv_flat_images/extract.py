@@ -10,7 +10,7 @@ OUTPUT_COLS = ("Title", "Content", "Date", "Image Featured", "Tags")
 
 
 def extract_body_content(html: str) -> str:
-    return re.sub(r"^.*<body>\s*|\s*</body>.*$", "", html, flags=re.DOTALL)
+    return re.sub(r"^.*<body(\s[^>]*)?>\s*|\s*</body>.*$", "", html, flags=re.DOTALL)
 
 
 def convert_to_csv(
@@ -94,9 +94,8 @@ def convert_to_csv(
             content = re.sub(r'<img\b[^>]* src=\"([^"]+)\"[^>]*>', update_img, content)
 
             if save_html:
-                with open(
-                    os.path.join(output_dir, basename + ".html"), "wt", encoding="utf8"
-                ) as f:
+                html_file = os.path.join(output_dir, basename + ".html")
+                with open(html_file, "wt", encoding="utf8") as f:
                     f.write(content)
 
             row = {key: "" for key in OUTPUT_COLS}

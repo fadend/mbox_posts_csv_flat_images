@@ -17,6 +17,13 @@ python mbox_posts_csv_flat_images/extract.py \
 You can also add the `--save_html` flag if you want to store HTML
 copies of the posts as well for debugging purposes.
 
+## Tests
+
+Using the builtin testing framework.
+```
+python -m unittest tests/extract_test.py
+```
+
 ## Acknowledgments
 
 Formatting Python with [black](https://github.com/psf/black).
