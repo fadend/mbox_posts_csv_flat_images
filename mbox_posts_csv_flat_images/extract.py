@@ -1,3 +1,5 @@
+"""Extracts HTML text and photos from an mbox file."""
+
 import argparse
 import csv
 import hashlib
@@ -6,6 +8,7 @@ import os
 import re
 import sys
 
+# Expected output CSV columns.
 OUTPUT_COLS = ("Title", "Content", "Date", "Image Featured", "Tags")
 
 
@@ -13,7 +16,7 @@ def extract_body_content(html: str) -> str:
     return re.sub(r"^.*<body(\s[^>]*)?>\s*|\s*</body>.*$", "", html, flags=re.DOTALL)
 
 
-def convert_to_csv(
+def convert_mbox_to_csv(
     mbox_path: str, output_dir: str, max_posts: int = -1, save_html=False
 ):
     images_dir = os.path.join(output_dir, "images")
@@ -128,7 +131,7 @@ if __name__ == "__main__":
         action="store_true",
     )
     args = parser.parse_args()
-    convert_to_csv(
+    convert_mbox_to_csv(
         mbox_path=args.input_mbox,
         output_dir=args.output_dir,
         max_posts=args.max_posts,
