@@ -93,6 +93,10 @@ def convert_mbox_to_csv(
                 original = m[0]
                 src = m[1]
                 if not src.startswith("cid:"):
+                    print(
+                        f"Keeping original img src for {message_index} in {mbox_path}: src={src}",
+                        file=sys.stderr,
+                    )
                     return original
                 content_id = src[4:]
                 if content_id not in content_id_to_image_bytes:
@@ -100,7 +104,8 @@ def convert_mbox_to_csv(
                         f"Unknown img {content_id} in message {message_index} in {mbox_path}",
                         file=sys.stderr,
                     )
-                    return original
+                    # Strip out the img. It will be broken anyway.
+                    return ""
                 if content_id not in content_id_to_file:
                     filename = f"images/{basename}_{len(content_id_to_file)}.jpeg"
                     with open(os.path.join(output_dir, filename), "wb") as f:
