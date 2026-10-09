@@ -109,7 +109,7 @@ def convert_mbox_to_csv(
             w.writerow(row)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(prog="mbox_posts_csv_flat_images")
     parser.add_argument(
         "--input_mbox",
@@ -137,3 +137,7 @@ if __name__ == "__main__":
         max_posts=args.max_posts,
         save_html=args.save_html,
     )
+
+
+if __name__ == "__main__":
+    main()
