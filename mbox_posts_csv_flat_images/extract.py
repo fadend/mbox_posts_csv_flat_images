@@ -3,6 +3,7 @@
 import argparse
 import csv
 import hashlib
+import html
 import mailbox
 import os
 import re
@@ -34,6 +35,13 @@ def convert_mbox_to_csv(
                     file=sys.stderr,
                 )
                 continue
+            # Skip replies
+            if re.match(r"(re: |fwd: )", subject, re.IGNORECASE):
+                print(
+                    f"Skipping message {message_index} subject {subject}: reply/fwd",
+                    file=sys.stderr,
+                )
+                continue
             content = ""
             content_id_to_image_bytes = {}
             for part in message.walk():
@@ -59,6 +67,12 @@ def convert_mbox_to_csv(
                     file=sys.stderr,
                 )
                 continue
+            if re.search(r"Hi\b", content):
+                print(
+                    f"Personal content for {message_index} subject {subject} in {mbox_path}",
+                    file=sys.stderr,
+                )
+                continue
 
             hash = hashlib.blake2b(digest_size=10)
             hash.update(content.encode("utf8"))
@@ -67,7 +81,10 @@ def convert_mbox_to_csv(
             ).strip("_")
             basename = normed_subject + "_" + hash.hexdigest()
 
+            # Cache of mapping from ID to file.
             content_id_to_file = {}
+            # Will be updated with the first image displayed in the HTML.
+            # Is modified in update_img while modifying img srcs.
             first_image = ""
 
             def update_img(m):
@@ -96,10 +113,22 @@ def convert_mbox_to_csv(
 
             content = re.sub(r'<img\b[^>]* src=\"([^"]+)\"[^>]*>', update_img, content)
 
+            # Skip messages with no images.
+            if not first_image:
+                print(
+                    f"Skipping message {message_index} subject {subject} in {mbox_path}: no images",
+                    file=sys.stderr,
+                )
+                continue
+
             if save_html:
+                html_content = content
+                html_content = re.sub(
+                    r"<head>", f"<head><title>{html.escape(subject)}</title>", content
+                )
                 html_file = os.path.join(output_dir, basename + ".html")
                 with open(html_file, "wt", encoding="utf8") as f:
-                    f.write(content)
+                    f.write(html_content)
 
             row = {key: "" for key in OUTPUT_COLS}
             row["Title"] = subject
