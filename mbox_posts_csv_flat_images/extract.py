@@ -25,7 +25,7 @@ def convert_mbox_to_csv(
     with open(os.path.join(output_dir, "posts.csv"), "wt", encoding="utf8") as f:
         w = csv.DictWriter(f, fieldnames=OUTPUT_COLS)
         w.writeheader()
-        for message_index, message in enumerate(mailbox.mbox(mbox_path), max_posts):
+        for message_index, message in enumerate(mailbox.mbox(mbox_path)):
             if max_posts >= 0 and message_index >= max_posts:
                 break
             subject = message["Subject"]
