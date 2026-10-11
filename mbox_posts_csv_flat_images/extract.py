@@ -7,6 +7,7 @@ import html
 import mailbox
 import os
 import re
+import string
 import sys
 
 # Expected output CSV columns.
@@ -28,7 +29,10 @@ def extract_i_tags(html_text: str) -> list[str]:
     tags = re.findall(r"<i\b[^>]*>(.*?)</i>", html_text, re.DOTALL)
     tags = [re.sub("<[^>]+>", "", tag) for tag in tags]
     tags = [html.unescape(tag) for tag in tags]
-    tags = [re.sub(r"\s+", " ", tag).strip().replace("|", "") for tag in tags]
+    punctuation_no_quotes = string.punctuation.replace('"', "").replace("'", "")
+    tags = [re.sub(f"[{re.escape(punctuation_no_quotes)}]", "", tag) for tag in tags]
+    # Normalize spaces.
+    tags = [re.sub(r"\s+", " ", tag).strip() for tag in tags]
     result = []
     known = set()
     for tag in tags:
