@@ -17,6 +17,30 @@ def extract_body_content(html: str) -> str:
     return re.sub(r"^.*<body(\s[^>]*)?>\s*|\s*</body>.*$", "", html, flags=re.DOTALL)
 
 
+def extract_i_tags(html_text: str) -> list[str]:
+    """Extracts text within <i> tags. Normalizes spaces, unescapes HTML entities.
+
+    Also strips pipe chars since these are used a separator in the final output.
+
+    Args:
+      html_text: HTML from which to extract tags.
+    Returns: List of unique tags in the order of first appearance."""
+    tags = re.findall(r"<i\b[^>]*>(.*?)</i>", html_text, re.DOTALL)
+    tags = [re.sub("<[^>]+>", "", tag) for tag in tags]
+    tags = [html.unescape(tag) for tag in tags]
+    tags = [re.sub(r"\s+", " ", tag).strip().replace("|", "") for tag in tags]
+    result = []
+    known = set()
+    for tag in tags:
+        # No empty tags
+        if not tag:
+            continue
+        if tag not in known:
+            known.add(tag)
+            result.append(tag)
+    return result
+
+
 def convert_mbox_to_csv(
     mbox_path: str, output_dir: str, max_posts: int = -1, save_html=False
 ):
@@ -147,6 +171,7 @@ def convert_mbox_to_csv(
             row["Content"] = extract_body_content(content)
             row["Date"] = message["Date"]
             row["Image Featured"] = first_image
+            row["Tags"] = "|".join(extract_i_tags(row["Content"]))
             w.writerow(row)
 
 
