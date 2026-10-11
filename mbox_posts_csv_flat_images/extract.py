@@ -22,6 +22,7 @@ def convert_mbox_to_csv(
 ):
     images_dir = os.path.join(output_dir, "images")
     os.makedirs(images_dir, exist_ok=True)
+    basename_to_index = {}
     with open(os.path.join(output_dir, "posts.csv"), "wt", encoding="utf8") as f:
         w = csv.DictWriter(f, fieldnames=OUTPUT_COLS)
         w.writeheader()
@@ -80,6 +81,12 @@ def convert_mbox_to_csv(
                 r"_+", "_", re.sub(r"[^a-z0-9]", "_", subject.lower())
             ).strip("_")
             basename = normed_subject + "_" + hash.hexdigest()
+            if basename in basename_to_index:
+                print(
+                    f"Message {message_index}, <{subject}> is duplicate of {basename_to_index[basename]}"
+                )
+                continue
+            basename_to_index[basename] = message_index
 
             # Cache of mapping from ID to file.
             content_id_to_file = {}
